@@ -13,6 +13,10 @@ let grid =
   ->Belt.Array.keep(x => x != "")
   ->Belt.Array.map(x => Js.String2.split(x, ""))
 
+// 라인을 하나 아래로 이동
+// 오른쪽으로 3칸 이동 -> 이동된 칸은 해당 라인 넓이의 mod로 정한다.
+// #을 만나면 카운트 횟수를 1 추가
+
 // gird 높이와 너비를 구한다
 // 한칸씩 내려갈 때마다 오른쪽 좌표는 (현재 내려온 step *3)% width로 이동한다.
 // 이동한 위치의 값을 반환한다.
@@ -21,6 +25,11 @@ let grid =
 
 let height = grid->Belt.Array.length
 let width = grid->Belt.Array.getExn(0)->Belt.Array.length
+
+let getTree = (forest: array<array<string>>, (x, y)) => {
+  let t1 = forest->Belt.Array.get(x)
+  t1->Belt.Option.flatMap(line => line->Belt.Array.get(y))
+}
 
 let road =
   Belt.Array.range(1, height - 1)->Belt.Array.map(s =>
@@ -42,13 +51,13 @@ count->Js.log
  * multiply of each count
  *
  * 1. slope 를 내려가는 방식을 Tuple로 정리한다
- * 2. 현재 위치 기준 정해진 단위로 내려간뒤에 해당 위치의 grid 값을 return 한다.
- * 3. tree 가 몇개있는지 count 한다
-* 4. count 값들을 곱한다.
+ * 2. 현재 위치 기준 정해진 단위로 내려간 뒤에 해당 위치의 grid 값을 return 한다.
+ * 3. 각 경우 마다 tree 가 몇 개 있는지 count 한다
+ * 4. count 값들을 곱한다.
  */
 
-let step = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
-let roads = step->Belt.Array.map(((right, down)) => {
+let step = list{(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)}
+let roads = step->Belt.List.map(((right, down)) => {
   let rec downSlop = (~r, ~d, ~path) => {
     if d >= height {
       path
@@ -65,7 +74,6 @@ let roads = step->Belt.Array.map(((right, down)) => {
 })
 
 let counts =
-  roads->Belt.Array.map(r => r->Belt.Array.reduce(0, (acc, c) => c == "#" ? acc + 1 : acc))
+  roads->Belt.List.map(r => r->Belt.Array.reduce(0, (acc, c) => c == "#" ? acc + 1 : acc))
 
-counts->Js.log
-let result = counts->Belt.Array.reduce(1.0, (acc, c) => acc *. Js.Int.toFloat(c))->Js.log
+let result = counts->Belt.List.reduce(1.0, (acc, c) => acc *. Js.Int.toFloat(c))->Js.log
