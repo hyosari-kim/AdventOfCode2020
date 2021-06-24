@@ -43,7 +43,7 @@ let seatIds = bPass->Belt.Array.map(p => {
 
 seatIds->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)->Js.log
 
-//Part-2 : 내 자리 찾기!
+//Part-2 : 내 자리 ID 찾기
 /**
     input list 중에 없는 자리를 찾아라 = 내 자리.
 
@@ -53,5 +53,17 @@ seatIds->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)->Js.log
 
 //logic
 /**
-    1. 
+    2. (처음 ~ 마지막) 더한 값에 - boarding pass list 의 seatId들의 sum을 하면 빈 좌석이 나옴.
 */
+// seatIds->Belt.Array.length->Js.log
+let getMySeatId = seatIds => {
+  let min = seatIds->Js.Math.minMany_int
+  let max = seatIds->Js.Math.maxMany_int
+
+  let total = Belt.Array.range(min, max)->Belt.Array.reduce(0, (acc, i) => acc + i)
+  let idSum = seatIds->Belt.Array.reduce(0, (acc, i) => acc + i)
+
+  total - idSum
+}
+
+getMySeatId(seatIds)->Js.log
