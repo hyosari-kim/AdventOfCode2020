@@ -37,7 +37,7 @@ let seatIds = bPass->Belt.Array.map(p => {
   p
   ->Js.String2.split("")
   ->Belt.Array.reduce(0, (acc, c) => {
-    c == "B" || c == "R" ? acc * 2 + 1 : acc * 2
+    c == "B" || c == "R" ? lsl(acc, 1) + 1 : lsl(acc, 1)
   })
 })
 
@@ -51,17 +51,22 @@ seatIds->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)->Js.log
     list에서 나의 좌석에서 -1, +1 좌석이 반드시 존재한다.
 */
 
+let sum = ids => ids->Belt.Array.reduce(0, (acc, i) => acc + i)
+
 //logic
 /**
-    2. (처음 ~ 마지막) 더한 값에 - boarding pass list 의 seatId들의 sum을 하면 빈 좌석이 나옴.
+    2. (처음 ~ 마지막) 더한 값 - boarding pass list 의 seatId들의 sum을 하면 빈 좌석이 나옴.
+
+    Rescript sort를 적용
+    Sliding window 방식으로 refactoring 하기.
 */
 // seatIds->Belt.Array.length->Js.log
 let getMySeatId = seatIds => {
   let min = seatIds->Js.Math.minMany_int
   let max = seatIds->Js.Math.maxMany_int
 
-  let total = Belt.Array.range(min, max)->Belt.Array.reduce(0, (acc, i) => acc + i)
-  let idSum = seatIds->Belt.Array.reduce(0, (acc, i) => acc + i)
+  let total = Belt.Array.range(min, max)->sum
+  let idSum = seatIds->sum
 
   total - idSum
 }
