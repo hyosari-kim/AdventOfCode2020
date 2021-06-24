@@ -16,44 +16,32 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week1/Year2020Day5.txt")
 
 //logic
 /**
+    First-trial
     1. pass 에서 SeatID 계산
         1-1. 처음 7자리 추출하여 0-127 사이 최종 값 X 계산
         1-2. 마지막 3자리 추출하여 0-7 사이 최종 값 Y 계산
         1-3. X * 8 + Y 계산.
     2. max 
+
+    Second-trial
+    1. binary 에서 F,L 을 1 , B,R 을 0 으로 생각
+    2. boarding pass 의 char 를 하나씩 순회하면서 *2(shift)함
+    3. max
 */
 
 // 2 binary bit 연산으로 접근해보기
 
 let bPass = input->Js.String2.split("\n")->Belt.Array.keep(b => b != "")
 
-let getRow = (b: string) => Js.String2.substring(b, ~from=0, ~to_=7)
-let getColumn = (b: string) => Js.String2.substr(b, ~from=-3)
-
-let getLocNumber = (bSub: string, lowerStr: string, limit: int) => {
-  let range =
-    bSub
-    ->Js.String2.split("")
-    ->Belt.Array.reduce([0, limit], (acc, str) => {
-      let mid = (acc[0] + acc[1]) / 2
-
-      str == lowerStr ? [acc[0], mid] : [mid + 1, acc[1]]
-    })
-
-  range[1]
-}
-
-let result =
-  bPass
-  ->Belt.Array.map(b => {
-    let row = getRow(b)->getLocNumber("F", 127)
-    let col = getColumn(b)->getLocNumber("L", 7)
-
-    row * 8 + col
+let seatIds = bPass->Belt.Array.map(p => {
+  p
+  ->Js.String2.split("")
+  ->Belt.Array.reduce(0, (acc, c) => {
+    c == "B" || c == "R" ? acc * 2 + 1 : acc * 2
   })
-  ->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)
+})
 
-result->Js.log
+seatIds->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)->Js.log
 
 //Part-2 : 내 자리 찾기!
 /**
