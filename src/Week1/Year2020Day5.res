@@ -57,18 +57,56 @@ let sum = ids => ids->Belt.Array.reduce(0, (acc, i) => acc + i)
 /**
     2. (처음 ~ 마지막) 더한 값 - boarding pass list 의 seatId들의 sum을 하면 빈 좌석이 나옴.
 
-    Rescript sort를 적용
+    1. Rescript sort를 적용
+
+    
+    2. 현재 값 기준 2개를 take (현재값 포함)
+    3. accumlator에 take 한 list 를 append: concat(acc, list{take(2)})
+
     Sliding window 방식으로 refactoring 하기.
 */
-// seatIds->Belt.Array.length->Js.log
-let getMySeatId = seatIds => {
-  let min = seatIds->Js.Math.minMany_int
-  let max = seatIds->Js.Math.maxMany_int
+seatIds->Belt.Array.length->Js.log
 
-  let total = Belt.Array.range(min, max)->sum
-  let idSum = seatIds->sum
+let list = seatIds->Belt.SortArray.stableSortBy(Pervasives.compare)->Belt.List.fromArray
 
-  total - idSum
+/*
+let slidingWindow = list => {
+  let rec foo = (list, acc) => {
+    if list == None {
+      Some(acc)
+    } else {
+      let candi = list->Belt.Option.flatMap(list => list->Belt.List.take(2))
+      let n_acc = candi->Belt.Option.map(c => Belt.List.concat(acc, list{c}))
+
+      let tail = list->Belt.Option.flatMap(l => l->Belt.List.tail)
+      n_acc->Belt.Option.flatMap(a => foo(tail, a))
+    }
+  }
+
+  foo(Some(list), list{})
+}
+*/
+// List<int> -> List<(int, int)>
+
+// const t = { candi: [x, y], tail: acc }
+// const { candi, tail } = t)
+
+/*
+
+*/
+
+let slidingWindow = list => {
+  let rec loop = (list, acc) => {
+    let c = list->Belt.List.take(2)
+    let x = list->Belt.List.tail
+    let t = (c, x)
+    switch t {
+    | (Some(candi), Some(tail)) => list{candi, ...loop(tail, acc)}
+    | _ => acc
+    }
+  }
+
+  loop(list, list{})
 }
 
-getMySeatId(seatIds)->Js.log
+slidingWindow(list)->Js.log
