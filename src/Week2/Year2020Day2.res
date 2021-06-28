@@ -32,6 +32,8 @@ type row = {
   pw: string,
 }
 
+type db = list<row>
+
 let db =
   input
   ->Js.String2.split("\n")
@@ -61,18 +63,14 @@ let db =
   })
 
 db
-->Belt.List.keep(r => {
-  let {policy, pw} = r
-  let {p, letter} = policy
-  let list{atLeast, ...atMost} = p
-
-  let minNum = atLeast->int_of_string
-  let maxNum = atMost->Belt.List.getExn(0)->int_of_string
-
+->Belt.List.keep(({policy: {p, letter}, pw}) => {
   let count =
     pw->Js.String2.split("")->Belt.Array.reduce(0, (acc, c) => c == letter ? acc + 1 : acc)
 
-  minNum <= count && maxNum >= count
+  switch p {
+  | list{atLeast, atMost, ..._} => atLeast->int_of_string <= count && atMost->int_of_string >= count
+  | _ => false
+  }
 })
 ->Belt.List.length
 ->Js.log
@@ -81,9 +79,8 @@ db
 질문
 1. List -> Tuple casting  하는 방법
 2. int_of_string 은 error throw 하는데 더 좋은 방법이 있는지 : string to int type casting 할때
-3. [] warnning 없애기 (노란줄 없애는 방법)
+3. 노란줄 Waning 없애는 방법.
 4. Record type 상속이 있는지. Doc 에서는 module type 에서 include 가 있던데 그냥 type 에서 쓰는 방법.
-
 */
 
 // part2
@@ -97,19 +94,19 @@ db
  */
 
 db
-->Belt.List.keep(r => {
-  let {policy, pw} = r
-  let {p, letter} = policy
-  let list{firstN, ...lastN} = p
+->Belt.List.keep(({policy: {p: positions, letter}, pw}) => {
+  switch positions {
+  | list{firstN, lastN, ..._} =>
+    let firstPos = firstN->int_of_string
+    let lastPos = lastN->int_of_string
 
-  let firstPos = firstN->int_of_string
-  let lastPos = lastN->Belt.List.getExn(0)->int_of_string
+    let isFirstExsists = pw->Js.String2.get(firstPos - 1)->(l => l === letter)
+    let isLastExists = pw->Js.String2.get(lastPos - 1)->(l => l === letter)
 
-  let firstLetter = pw->Js.String2.get(firstPos - 1)
-  let lastLetter = pw->Js.String2.get(lastPos - 1)
-
-  (firstLetter == letter || lastLetter == letter) &&
-    !(firstLetter == letter && lastLetter == letter)
+    //xor
+    (isFirstExsists || isLastExists) && !(isFirstExsists && isLastExists)
+  | _ => false
+  }
 })
 ->Belt.List.length
 ->Js.log
