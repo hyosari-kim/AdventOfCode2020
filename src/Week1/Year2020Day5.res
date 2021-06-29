@@ -51,7 +51,10 @@ seatIds->Belt.Array.reduce(0, (acc, id) => acc > id ? acc : id)->Js.log
     list에서 나의 좌석에서 -1, +1 좌석이 반드시 존재한다.
 */
 
-let sum = ids => ids->Belt.Array.reduce(0, (acc, i) => acc + i)
+//point free 인자를 숨김.
+let plus = (x, y) => x + y
+
+let sum = ids => ids->Belt.Array.reduce(0, plus)
 
 //logic
 /**
