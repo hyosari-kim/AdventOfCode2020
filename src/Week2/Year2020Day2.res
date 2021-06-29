@@ -1,5 +1,17 @@
 // --- Day 2: Password Validation ---
 
+/**
+질문
+1. List -> Tuple casting  하는 방법
+ // 딱히 지정된 함수는 없음. 번거로운 작업이 있을 수 밖에 없음. 
+2. int_of_string 은 error throw 하는데 더 좋은 방법이 있는지 : string to int type casting 할때
+ //Belt.Int.FromString 이 있다.
+3. 노란줄 Waning 없애는 방법.
+    // 뜨는 이유? Rescript 에서는 함수가 total function 이어야 한다. 인자로 받는 모든 type에 대해서 다루겠다. partial function 들어오는 것에 대해서 일부는 처리하지 않겠다.
+4. Record type 상속이 있는지. Doc 에서는 module type 에서 include 가 있던데 그냥 type 에서 쓰는 방법.
+    없습니다.
+*/
+
 let input = Node.Fs.readFileAsUtf8Sync("input/Week2/Year2020Day2.txt")
 // part1
 /**
@@ -23,16 +35,6 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week2/Year2020Day2.txt")
     type DB = list<Row>
 4. count 가 freq 조건을 만족하는 경우만 keep
 */
-type policy = {
-  p: list<string>,
-  letter: string,
-}
-type row = {
-  policy: policy,
-  pw: string,
-}
-
-type db = list<row>
 
 //함수 하나가 너무 많은 기능을 가지고 있지 않기. -> 세부 함수로 나눠볼것.
 
@@ -43,69 +45,69 @@ type db = list<row>
 
 //error 처리에 대한 관점.
 
+//refacting logic
+/**
+  전처리
+    input type : string
+    output type : list<Option<{policy: Option<(string, string)>, pw: string}>>
+
+    1. 라인별 split string -> array<string>
+    2. list 로 변환 array<string> -> list<string>
+    3. policy와 pw 분리 list<string> -> list<Option<(policy: string, pw: string)>>
+      3-1. 결과 policy 와 pw 로 분리된 케이스는 Some, 아니면 None 
+    4. policy 안에서 number, letter 로 분리 -> list<Option<{policy: Option<{policy:Option<(string, string)>, pw: string}>
+*/
+
+type row = {
+  policy: (string, string),
+  pw: string,
+}
+
+type db = list<row>
+
+//전처리
 let db =
   input
   ->Js.String2.split("\n")
   ->Belt.List.fromArray
   ->Belt.List.keepMap(r =>
     switch r->Js.String2.split(":")->Belt.List.fromArray {
-    | list{po, password} => Some((po, password))
+    | list{policy, pw} => Some((policy, pw->Js.String2.trim))
     | _ => None
     }
   )
-  ->Belt.List.map(r => {
-    // 인자가 한개 or 없을때는 다루는 부분이 없다. = 2개 이상부터 다룰수 있음.
-    r->Belt.Option.map(r => {
-      let (po, password) = r
-
-      let policy =
-        po
-        ->Js.String2.split(" ")
-        ->Belt.List.fromArray
-        ->(
-          p => {
-            let list{pString, letter, ..._} = p
-            {
-              //tuple 만드는 법
-              p: pString->Js.String2.split("-")->(ary => ary->Belt.List.fromArray),
-              letter: letter,
-            }
-          }
-        )
-
-      {
-        policy: policy,
-        pw: password->Js.String2.trim,
-      }
-    })
+  ->Belt.List.keepMap(r => {
+    let (policy, pw) = r
+    switch policy->Js.String2.split(" ")->Belt.List.fromArray {
+    | list{p, letter} => Some({policy: (p, letter), pw: pw})
+    | _ => None
+    }
   })
 
+//part 1
 db
-->Belt.List.keep(({policy: {p, letter}, pw}) => {
-  let count =
-    pw->Js.String2.split("")->Belt.Array.reduce(0, (acc, c) => c == letter ? acc + 1 : acc)
+->Belt.List.map(({policy, pw}) => {
+  let (_, letter) = policy
 
-  switch p {
-  | list{atLeast, atMost, ..._} => atLeast->int_of_string <= count && atMost->int_of_string >= count
+  let countLetter = (a, b) => b == letter ? a + 1 : a
+  let cnt = pw->Js.String2.split("")->Belt.Array.reduce(0, countLetter)
+
+  (policy, cnt)
+})
+->Belt.List.keep(r => {
+  let ((p, _), cnt) = r
+
+  switch p->Js.String2.split("-")->Belt.List.fromArray {
+  | list{min, max} =>
+    switch (min->Belt.Int.fromString, max->Belt.Int.fromString) {
+    | (Some(mi), Some(ma)) => mi <= cnt && ma >= cnt
+    | _ => false
+    }
   | _ => false
   }
 })
 ->Belt.List.length
 ->Js.log
-
-let a = "123"->Belt.Int.fromString
-
-/**
-질문
-1. List -> Tuple casting  하는 방법
- // 딱히 지정된 함수는 없음. 번거로운 작업이 있을 수 밖에 없음. 
-2. int_of_string 은 error throw 하는데 더 좋은 방법이 있는지 : string to int type casting 할때
- //Belt.Int.FromString 이 있다.
-3. 노란줄 Waning 없애는 방법.
-    // 뜨는 이유? Rescript 에서는 함수가 total function 이어야 한다. 인자로 받는 모든 type에 대해서 다루겠다. partial function 들어오는 것에 대해서 일부는 처리하지 않겠다.
-4. Record type 상속이 있는지. Doc 에서는 module type 에서 include 가 있던데 그냥 type 에서 쓰는 방법.
-    없습니다.
-*/
 
 // part2
 /**
@@ -118,19 +120,22 @@ let a = "123"->Belt.Int.fromString
  */
 
 db
-->Belt.List.keep(({policy: {p: positions, letter}, pw}) => {
-  switch positions {
-  | list{firstN, lastN, ..._} =>
-    let firstPos = firstN->int_of_string
-    let lastPos = lastN->int_of_string
+->Belt.List.map(({policy, pw}) => {
+  let (p, letter) = policy
 
-    let isFirstExsists = pw->Js.String2.get(firstPos - 1)->(l => l === letter)
-    let isLastExists = pw->Js.String2.get(lastPos - 1)->(l => l === letter)
-
-    //xor
-    (isFirstExsists || isLastExists) && !(isFirstExsists && isLastExists)
-  | _ => false
+  switch p->Js.String2.split("-")->Belt.List.fromArray {
+  | list{fPos, lPos} =>
+    switch (fPos->Belt.Int.fromString, lPos->Belt.Int.fromString) {
+    | (Some(f), Some(l)) => (pw->Js.String2.get(f - 1), pw->Js.String2.get(l - 1), letter)
+    | _ => ("", "", letter)
+    }
+  | _ => ("", "", letter)
   }
+})
+->Belt.List.keep(r => {
+  let (f, l, letter) = r
+
+  (f == letter || l == letter) && !(f == letter && l == letter)
 })
 ->Belt.List.length
 ->Js.log
