@@ -45,7 +45,34 @@ input
     ->Belt.Array.map(str => str->Js.String2.split(""))
     ->Belt.Array.map(p => p->Belt.Set.String.fromArray)
 
-  let initSet = Belt.Set.String.fromArray(["a...z"])
+  let initSet = Belt.Set.String.fromArray([
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+  ])
 
   let intersectSet = people->Belt.Array.reduce(initSet, (acc, p) => {
     acc->Belt.Set.String.intersect(p)
@@ -58,7 +85,6 @@ input
   // acc -> 3 + 3 = 6
   // acc -> (((0 + 1) + 2) + 3) + 4 = 10
   // ....
-
   intersectSet->Belt.Set.String.size
 })
 ->Belt.Array.reduce(0, (acc, a) => acc + a)

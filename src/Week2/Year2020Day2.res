@@ -47,7 +47,7 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week2/Year2020Day2.txt")
 
 //refacting logic
 /**
-  전처리
+  전처리 - first trial
     input type : string
     output type : list<Option<{policy: Option<(string, string)>, pw: string}>>
 
@@ -56,10 +56,29 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week2/Year2020Day2.txt")
     3. policy와 pw 분리 list<string> -> list<Option<(policy: string, pw: string)>>
       3-1. 결과 policy 와 pw 로 분리된 케이스는 Some, 아니면 None 
     4. policy 안에서 number, letter 로 분리 -> list<Option<{policy: Option<{policy:Option<(string, string)>, pw: string}>
+
+  second trial
+    1. input type : string
+    2. output type: {
+      min: int,
+      max: int,
+      letter: string,
+      pw: string
+    }
+
+    *****
+
+      질문. min, max dummy keep 하는 부분 더 간단히 할 수 있을까?
+      option 인 것은 아예 취급 안하고 keepMap 을 써서 해결하고 싶은데 타입에러가 남.
+
+    ********8
+
 */
 
 type row = {
-  policy: (string, string),
+  min: int,
+  max: int,
+  letter: string,
   pw: string,
 }
 
@@ -69,42 +88,38 @@ type db = list<row>
 let db =
   input
   ->Js.String2.split("\n")
-  ->Belt.List.fromArray
-  ->Belt.List.keepMap(r =>
-    switch r->Js.String2.split(":")->Belt.List.fromArray {
-    | list{policy, pw} => Some((policy, pw->Js.String2.trim))
-    | _ => None
+  ->Belt.Array.map(p => p->Js.String2.splitByRe(%re("/[- :]/g")))
+  ->Belt.Array.map(p =>
+    switch p {
+    | [Some(min), Some(max), Some(letter), Some(_), Some(pw)] => {
+        min: min->Belt.Int.fromString->Belt.Option.getWithDefault(-1),
+        max: max->Belt.Int.fromString->Belt.Option.getWithDefault(-1),
+        letter: letter,
+        pw: pw->Js.String2.trim,
+      }
+    | _ => {
+        min: -1,
+        max: -1,
+        letter: "/",
+        pw: "",
+      }
     }
   )
-  ->Belt.List.keepMap(r => {
-    let (policy, pw) = r
-    switch policy->Js.String2.split(" ")->Belt.List.fromArray {
-    | list{p, letter} => Some({policy: (p, letter), pw: pw})
-    | _ => None
-    }
-  })
+  ->Belt.Array.keep(p => p.min != -1)
+  ->Belt.List.fromArray
 
 //part 1
 db
-->Belt.List.map(({policy, pw}) => {
-  let (_, letter) = policy
-
+->Belt.List.map(({min, max, letter, pw}) => {
   let countLetter = (a, b) => b == letter ? a + 1 : a
   let cnt = pw->Js.String2.split("")->Belt.Array.reduce(0, countLetter)
 
-  (policy, cnt)
+  (min, max, cnt)
 })
 ->Belt.List.keep(r => {
-  let ((p, _), cnt) = r
+  let (min, max, cnt) = r
 
-  switch p->Js.String2.split("-")->Belt.List.fromArray {
-  | list{min, max} =>
-    switch (min->Belt.Int.fromString, max->Belt.Int.fromString) {
-    | (Some(mi), Some(ma)) => mi <= cnt && ma >= cnt
-    | _ => false
-    }
-  | _ => false
-  }
+  min <= cnt && max >= cnt
 })
 ->Belt.List.length
 ->Js.log
@@ -120,17 +135,8 @@ db
  */
 
 db
-->Belt.List.map(({policy, pw}) => {
-  let (p, letter) = policy
-
-  switch p->Js.String2.split("-")->Belt.List.fromArray {
-  | list{fPos, lPos} =>
-    switch (fPos->Belt.Int.fromString, lPos->Belt.Int.fromString) {
-    | (Some(f), Some(l)) => (pw->Js.String2.get(f - 1), pw->Js.String2.get(l - 1), letter)
-    | _ => ("", "", letter)
-    }
-  | _ => ("", "", letter)
-  }
+->Belt.List.map(({min, max, letter, pw}) => {
+  (pw->Js.String2.get(min - 1), pw->Js.String2.get(max - 1), letter)
 })
 ->Belt.List.keep(r => {
   let (f, l, letter) = r
