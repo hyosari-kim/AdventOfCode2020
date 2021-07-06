@@ -89,23 +89,22 @@ let db =
   input
   ->Js.String2.split("\n")
   ->Belt.Array.map(p => p->Js.String2.splitByRe(%re("/[- :]/g")))
-  ->Belt.Array.map(p =>
+  ->Belt.Array.keepMap(p =>
     switch p {
-    | [Some(min), Some(max), Some(letter), Some(_), Some(pw)] => {
-        min: min->Belt.Int.fromString->Belt.Option.getWithDefault(-1),
-        max: max->Belt.Int.fromString->Belt.Option.getWithDefault(-1),
-        letter: letter,
-        pw: pw->Js.String2.trim,
+    | [Some(min), Some(max), Some(letter), Some(_), Some(pw)] =>
+      switch (min->Belt.Int.fromString, max->Belt.Int.fromString) {
+      | (Some(min), Some(max)) =>
+        Some({
+          min: min,
+          max: max,
+          letter: letter,
+          pw: pw->Js.String2.trim,
+        })
+      | _ => None
       }
-    | _ => {
-        min: -1,
-        max: -1,
-        letter: "/",
-        pw: "",
-      }
+    | _ => None
     }
   )
-  ->Belt.Array.keep(p => p.min != -1)
   ->Belt.List.fromArray
 
 //part 1

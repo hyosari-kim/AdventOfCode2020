@@ -11,6 +11,7 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week2/Year2020Day4.txt")
 /*
 1. passport 타입을 생각해봅시다. *문제와 동일하게* record로 선언하세요.
 */
+
 type height = Cm(int) | In(int)
 
 type eye = Amb | Blu | Grn | Gry | Hzl | Oth | Brn | None
@@ -37,6 +38,59 @@ let initPassport = {
   cid: None,
 }
 
+let parser = p =>
+  p->Belt.Array.reduce(initPassport, (acc, el) => {
+    switch el {
+    | Some(el) =>
+      switch el->Js.String2.split(":") {
+      | ["byr", v] => {...acc, byr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
+      | ["iyr", v] => {...acc, iyr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
+      | ["eyr", v] => {...acc, eyr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
+      | ["hgt", v] => {
+          ...acc,
+          hgt: v->(
+            v =>
+              switch v->Js.String2.sliceToEnd(~from=-2) {
+              | "cm" =>
+                v
+                ->Js.String2.slice(~from=0, ~to_=-2)
+                ->Belt.Int.fromString
+                ->Belt.Option.map(h => Cm(h))
+                ->Belt.Option.getWithDefault(Cm(0))
+              | "in" =>
+                v
+                ->Js.String2.slice(~from=0, ~to_=-2)
+                ->Belt.Int.fromString
+                ->Belt.Option.map(h => In(h))
+                ->Belt.Option.getWithDefault(Cm(0))
+              | _ => Cm(0)
+              }
+          ),
+        }
+      | ["hcl", v] => {...acc, hcl: v}
+      | ["ecl", v] => {
+          ...acc,
+          ecl: v->(
+            v =>
+              switch v {
+              | "amb" => Amb
+              | "blu" => Blu
+              | "brn" => Brn
+              | "gry" => Gry
+              | "grn" => Grn
+              | "hzl" => Hzl
+              | "oth" => Oth
+              | _ => None
+              }
+          ),
+        }
+      | ["pid", v] => {...acc, pid: v}
+      | ["cid", v] => {...acc, cid: Some(v)}
+      | _ => acc
+      }
+    | _ => acc
+    }
+  })
 /*
 2. string 타입의 입력을 passport 타입으로 파싱하는 parsePassport 함수를 작성해보세요.
    (우선 parsePassport 타입의 타입 시그니처를 생각해보세요)
@@ -58,60 +112,7 @@ let parsePassport = (input: string) =>
       }
     )
   )
-  ->Belt.Array.map(p =>
-    p->Belt.Array.reduce(initPassport, (acc, el) => {
-      switch el {
-      | Some(el) =>
-        switch el->Js.String2.split(":") {
-        | ["byr", v] => {...acc, byr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
-        | ["iyr", v] => {...acc, iyr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
-        | ["eyr", v] => {...acc, eyr: v->Belt.Int.fromString->Belt.Option.getWithDefault(0)}
-        | ["hgt", v] => {
-            ...acc,
-            hgt: v->(
-              v =>
-                switch v->Js.String2.sliceToEnd(~from=-2) {
-                | "cm" =>
-                  v
-                  ->Js.String2.slice(~from=0, ~to_=-2)
-                  ->Belt.Int.fromString
-                  ->Belt.Option.map(h => Cm(h))
-                  ->Belt.Option.getWithDefault(Cm(0))
-                | "in" =>
-                  v
-                  ->Js.String2.slice(~from=0, ~to_=-2)
-                  ->Belt.Int.fromString
-                  ->Belt.Option.map(h => In(h))
-                  ->Belt.Option.getWithDefault(Cm(0))
-                | _ => Cm(0)
-                }
-            ),
-          }
-        | ["hcl", v] => {...acc, hcl: v}
-        | ["ecl", v] => {
-            ...acc,
-            ecl: v->(
-              v =>
-                switch v {
-                | "amb" => Amb
-                | "blu" => Blu
-                | "brn" => Brn
-                | "gry" => Gry
-                | "grn" => Grn
-                | "hzl" => Hzl
-                | "oth" => Oth
-                | _ => None
-                }
-            ),
-          }
-        | ["pid", v] => {...acc, pid: v}
-        | ["cid", v] => {...acc, cid: Some(v)}
-        | _ => acc
-        }
-      | _ => acc
-      }
-    })
-  )
+  ->Belt.Array.map(parser)
 let passports = input->parsePassport
 
 passports->Js.log
