@@ -1,4 +1,4 @@
-let input = Node.Fs.readFileAsUtf8Sync("input/Week3/Year2020Day7.txt")
+let input = Node.Fs.readFileAsUtf8Sync("input/Week3/Year2020Day7.sample.txt")
 
 //DAG (Directed Acyclic Graph)
 
@@ -7,7 +7,7 @@ let input = Node.Fs.readFileAsUtf8Sync("input/Week3/Year2020Day7.txt")
 
 type rule = {
   key: string,
-  bags: array<(int, string)>,
+  bags: array<option<(int, string)>>,
 }
 
 let emptyBag = (0, "")
@@ -25,8 +25,7 @@ let parse = (row: string) => {
       ->Belt.Array.map(bag => bag->Belt.Array.sliceToEnd(1))
       ->Belt.Array.keepMap(bag =>
         switch bag {
-        | [num, name] =>
-          Some(num->Belt.Int.fromString->Belt.Option.mapWithDefault(emptyBag, n => (n, name)))
+        | [num, name] => Some(num->Belt.Int.fromString->Belt.Option.map(n => (n, name)))
         | _ => None
         }
       ),
@@ -39,15 +38,19 @@ let parse = (row: string) => {
 // Search
 
 let rules = input->Js.String2.split("\n")->Belt.Array.keepMap(parse)
+rules->Js.log
 let keyword = "shiny gold"
 
 let rec search = (rule, keyword) => {
   rule.bags->Belt.Array.reduce(0, (acc, bag) => {
-    let (_, name) = bag
+    switch bag {
+    | None => 0
+    | Some(bag) =>
+      let (_, name) = bag
+      let rule = rules->Belt.Array.keep(r => r.key === name)->Belt.Array.getExn(0)
 
-    let rule = rules->Belt.Array.keep(r => r.key === name)->Belt.Array.get(0)
-
-    acc + (name == keyword ? 1 : rule->Belt.Option.mapWithDefault(0, r => r->search(keyword)))
+      acc + (name == keyword ? 1 : rule->search(keyword))
+    }
   })
 }
 
@@ -68,11 +71,14 @@ rules
 
 let rec search2 = rule => {
   rule.bags->Belt.Array.reduce(0, (acc, bag) => {
-    let (cnt, name) = bag
+    switch bag {
+    | None => 0
+    | Some(bag) =>
+      let (cnt, name) = bag
+      let rule = rules->Belt.Array.keep(r => r.key == name)->Belt.Array.getExn(0)
 
-    let rule = rules->Belt.Array.keep(r => r.key == name)->Belt.Array.get(0)
-
-    acc + cnt + cnt * rule->Belt.Option.mapWithDefault(0, r => r->search2)
+      acc + cnt + cnt * rule->search2
+    }
   })
 }
 
