@@ -68,12 +68,61 @@ let state = {accumulator: 0, nextIndex: 0, instructions: inst}
 
 let rec findInfinLoop = state => {
   let state' = state->next
-  switch state'.nextIndex == -1 {
+  switch state'.nextIndex == -1 || state'.nextIndex >= state'.instructions->Belt.Array.length {
   | true => state'
   | false => state'->findInfinLoop
   }
 }
 
-state->findInfinLoop->Js.log
+let current = state->findInfinLoop
+current.accumulator->Js.log
 
 // part2
+let instructions = input->parser
+
+let rec change = (nextIndex: int, instructions: array<(instruction, int, bool)>) => {
+  switch instructions->Belt.Array.get(nextIndex) {
+  | Some((Nop, value, visited)) => (
+      nextIndex + 1,
+      Belt.Array.concatMany([
+        instructions->Belt.Array.slice(~offset=0, ~len=nextIndex),
+        [(Jmp, value, visited)],
+        instructions->Belt.Array.sliceToEnd(nextIndex + 1),
+      ]),
+    )
+  | Some((Jmp, value, visited)) => (
+      nextIndex + 1,
+      Belt.Array.concatMany([
+        instructions->Belt.Array.slice(~offset=0, ~len=nextIndex),
+        [(Nop, value, visited)],
+        instructions->Belt.Array.sliceToEnd(nextIndex + 1),
+      ]),
+    )
+  | Some((Acc, _, _)) => change(nextIndex + 1, instructions)
+  | _ => (nextIndex + 1, instructions)
+  }
+}
+
+type loop = Loop | NoLoop(int)
+
+let hasLoop = (instructions: array<(instruction, int, bool)>) => {
+  let state = {accumulator: 0, nextIndex: 0, instructions: instructions}
+
+  let finalState = state->findInfinLoop
+
+  switch finalState.nextIndex == -1 {
+  | true => Loop
+  | false => NoLoop(finalState.accumulator)
+  }
+}
+
+let rec handleLoop = (nextIndex: int, instructions: array<(instruction, int, bool)>) => {
+  let (nextIndex', instructions') = nextIndex->change(instructions)
+
+  switch instructions'->hasLoop {
+  | Loop => handleLoop(nextIndex', instructions)
+  | NoLoop(acc') => acc'
+  }
+}
+
+handleLoop(0, instructions)->Js.log
