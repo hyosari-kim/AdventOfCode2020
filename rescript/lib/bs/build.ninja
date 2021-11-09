@@ -1,0 +1,22 @@
+rescript = 1
+rule astj
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsc.exe  -bs-v 9.1.4  -absname -bs-ast -o $out $i
+o src/Week2/Year2020Day4.ast : astj ../../src/Week2/Year2020Day4.res
+rule deps
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsb_helper.exe -hash ffd917cb12098d735f35e35841a75b02 $in
+  restat = 1
+o src/Week2/Year2020Day4.d : deps src/Week2/Year2020Day4.ast
+rule mij
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsc.exe -I src/Week1 -I src/Week2 -I src   -bs-package-name advent-of-code-rescript -bs-package-output commonjs:lib/js/$in_d:.js $i
+  dyndep = 1
+  restat = 1
+o src/Week2/Year2020Day4.cmj src/Week2/Year2020Day4.cmi ../js/src/Week2/Year2020Day4.js : mij src/Week2/Year2020Day4.ast
+o src/Week1/Year2020Day3.ast : astj ../../src/Week1/Year2020Day3.res
+o src/Week1/Year2020Day3.d : deps src/Week1/Year2020Day3.ast
+o src/Week1/Year2020Day3.cmj src/Week1/Year2020Day3.cmi ../js/src/Week1/Year2020Day3.js : mij src/Week1/Year2020Day3.ast
+o src/Week1/Year2020Day5.ast : astj ../../src/Week1/Year2020Day5.res
+o src/Week1/Year2020Day5.d : deps src/Week1/Year2020Day5.ast
+o src/Week1/Year2020Day5.cmj src/Week1/Year2020Day5.cmi ../js/src/Week1/Year2020Day5.js : mij src/Week1/Year2020Day5.ast
+o src/Week1/Year2020Day6.ast : astj ../../src/Week1/Year2020Day6.res
+o src/Week1/Year2020Day6.d : deps src/Week1/Year2020Day6.ast
+o src/Week1/Year2020Day6.cmj src/Week1/Year2020Day6.cmi ../js/src/Week1/Year2020Day6.js : mij src/Week1/Year2020Day6.ast

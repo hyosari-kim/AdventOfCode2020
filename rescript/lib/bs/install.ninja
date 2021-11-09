@@ -1,0 +1,22 @@
+rescript = 1
+rule cp
+  command = cp $i $out
+rule touch
+ command = touch $out
+o Year2020Day4.cmi : cp ../bs/src/Week2/Year2020Day4.cmi
+o Year2020Day4.cmj : cp ../bs/src/Week2/Year2020Day4.cmj
+o Year2020Day4.cmt : cp ../bs/src/Week2/Year2020Day4.cmt
+o Year2020Day4.res : cp ../../src/Week2/Year2020Day4.res
+o Year2020Day3.cmi : cp ../bs/src/Week1/Year2020Day3.cmi
+o Year2020Day3.cmj : cp ../bs/src/Week1/Year2020Day3.cmj
+o Year2020Day3.cmt : cp ../bs/src/Week1/Year2020Day3.cmt
+o Year2020Day3.res : cp ../../src/Week1/Year2020Day3.res
+o Year2020Day5.cmi : cp ../bs/src/Week1/Year2020Day5.cmi
+o Year2020Day5.cmj : cp ../bs/src/Week1/Year2020Day5.cmj
+o Year2020Day5.cmt : cp ../bs/src/Week1/Year2020Day5.cmt
+o Year2020Day5.res : cp ../../src/Week1/Year2020Day5.res
+o Year2020Day6.cmi : cp ../bs/src/Week1/Year2020Day6.cmi
+o Year2020Day6.cmj : cp ../bs/src/Week1/Year2020Day6.cmj
+o Year2020Day6.cmt : cp ../bs/src/Week1/Year2020Day6.cmt
+o Year2020Day6.res : cp ../../src/Week1/Year2020Day6.res
+build install.stamp : touch Year2020Day4.cmi Year2020Day4.cmj Year2020Day3.cmi Year2020Day3.cmj Year2020Day5.cmi Year2020Day5.cmj Year2020Day6.cmi Year2020Day6.cmj 
