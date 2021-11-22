@@ -27,3 +27,5 @@ lib/bs
 node_modules/
 package-lock.json
 src/*.bs.js
+rescript/lib/bs/*
+_build

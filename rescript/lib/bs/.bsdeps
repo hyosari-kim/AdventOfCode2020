@@ -1,9 +1,11 @@
 9.1.4
-/Users/hyoeunkim/code/2020_AOC_ReScript
+/Users/hyoeunkim/code/2020_AOC_ReScript/rescript
 0
-bsconfig.json	0x1.8354c05645f6ap+30
-src	0x1.8354c056478fp+30
-src/Week2	0x1.8354c05647b6cp+30
-src/Week1	0x1.8355bac75a916p+30
+bsconfig.json	0x1.866d9de5e9604p+30
+src	0x1.866d6374d12ep+30
+src/Week3	0x1.8629dd7280febp+30
+src/Week4	0x1.8629dd7281206p+30
+src/Week2	0x1.866d603dc544dp+30
+src/Week1	0x1.861fe121ebba2p+30
 ===
-/Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/rescript.exe	0x1.8355048a930f2p+30
+/Users/hyoeunkim/code/2020_AOC_ReScript/rescript/node_modules/rescript/darwin/rescript.exe	0x1.86788a3c47253p+30

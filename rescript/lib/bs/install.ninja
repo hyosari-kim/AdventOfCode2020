@@ -3,10 +3,30 @@ rule cp
   command = cp $i $out
 rule touch
  command = touch $out
+o Year2020Day9.cmi : cp ../bs/src/Year2020Day9.cmi
+o Year2020Day9.cmj : cp ../bs/src/Year2020Day9.cmj
+o Year2020Day9.cmt : cp ../bs/src/Year2020Day9.cmt
+o Year2020Day9.res : cp ../../src/Year2020Day9.res
+o Year2020Day7.cmi : cp ../bs/src/Week3/Year2020Day7.cmi
+o Year2020Day7.cmj : cp ../bs/src/Week3/Year2020Day7.cmj
+o Year2020Day7.cmt : cp ../bs/src/Week3/Year2020Day7.cmt
+o Year2020Day7.res : cp ../../src/Week3/Year2020Day7.res
+o Year2020Day8.cmi : cp ../bs/src/Week4/Year2020Day8.cmi
+o Year2020Day8.cmj : cp ../bs/src/Week4/Year2020Day8.cmj
+o Year2020Day8.cmt : cp ../bs/src/Week4/Year2020Day8.cmt
+o Year2020Day8.res : cp ../../src/Week4/Year2020Day8.res
+o Year2020Day2.cmi : cp ../bs/src/Week2/Year2020Day2.cmi
+o Year2020Day2.cmj : cp ../bs/src/Week2/Year2020Day2.cmj
+o Year2020Day2.cmt : cp ../bs/src/Week2/Year2020Day2.cmt
+o Year2020Day2.res : cp ../../src/Week2/Year2020Day2.res
 o Year2020Day4.cmi : cp ../bs/src/Week2/Year2020Day4.cmi
 o Year2020Day4.cmj : cp ../bs/src/Week2/Year2020Day4.cmj
 o Year2020Day4.cmt : cp ../bs/src/Week2/Year2020Day4.cmt
 o Year2020Day4.res : cp ../../src/Week2/Year2020Day4.res
+o Year2020Day4_t1.cmi : cp ../bs/src/Week2/Year2020Day4_t1.cmi
+o Year2020Day4_t1.cmj : cp ../bs/src/Week2/Year2020Day4_t1.cmj
+o Year2020Day4_t1.cmt : cp ../bs/src/Week2/Year2020Day4_t1.cmt
+o Year2020Day4_t1.res : cp ../../src/Week2/Year2020Day4_t1.res
 o Year2020Day3.cmi : cp ../bs/src/Week1/Year2020Day3.cmi
 o Year2020Day3.cmj : cp ../bs/src/Week1/Year2020Day3.cmj
 o Year2020Day3.cmt : cp ../bs/src/Week1/Year2020Day3.cmt
@@ -19,4 +39,4 @@ o Year2020Day6.cmi : cp ../bs/src/Week1/Year2020Day6.cmi
 o Year2020Day6.cmj : cp ../bs/src/Week1/Year2020Day6.cmj
 o Year2020Day6.cmt : cp ../bs/src/Week1/Year2020Day6.cmt
 o Year2020Day6.res : cp ../../src/Week1/Year2020Day6.res
-build install.stamp : touch Year2020Day4.cmi Year2020Day4.cmj Year2020Day3.cmi Year2020Day3.cmj Year2020Day5.cmi Year2020Day5.cmj Year2020Day6.cmi Year2020Day6.cmj 
+build install.stamp : touch Year2020Day9.cmi Year2020Day9.cmj Year2020Day7.cmi Year2020Day7.cmj Year2020Day8.cmi Year2020Day8.cmj Year2020Day2.cmi Year2020Day2.cmj Year2020Day4.cmi Year2020Day4.cmj Year2020Day4_t1.cmi Year2020Day4_t1.cmj Year2020Day3.cmi Year2020Day3.cmj Year2020Day5.cmi Year2020Day5.cmj Year2020Day6.cmi Year2020Day6.cmj 

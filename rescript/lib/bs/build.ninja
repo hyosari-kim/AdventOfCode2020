@@ -1,16 +1,31 @@
 rescript = 1
 rule astj
-  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsc.exe  -bs-v 9.1.4  -absname -bs-ast -o $out $i
-o src/Week2/Year2020Day4.ast : astj ../../src/Week2/Year2020Day4.res
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/rescript/node_modules/rescript/darwin/bsc.exe  -bs-v 9.1.4  -absname -bs-ast -o $out $i
+o src/Year2020Day9.ast : astj ../../src/Year2020Day9.res
 rule deps
-  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsb_helper.exe -hash ffd917cb12098d735f35e35841a75b02 $in
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/rescript/node_modules/rescript/darwin/bsb_helper.exe -hash 00f732659f064f17a96fd288e2542a0a $in
   restat = 1
-o src/Week2/Year2020Day4.d : deps src/Week2/Year2020Day4.ast
+o src/Year2020Day9.d : deps src/Year2020Day9.ast
 rule mij
-  command = /Users/hyoeunkim/code/2020_AOC_ReScript/node_modules/rescript/darwin/bsc.exe -I src/Week1 -I src/Week2 -I src   -bs-package-name advent-of-code-rescript -bs-package-output commonjs:lib/js/$in_d:.js $i
+  command = /Users/hyoeunkim/code/2020_AOC_ReScript/rescript/node_modules/rescript/darwin/bsc.exe -I src/Week1 -I src/Week2 -I src/Week4 -I src/Week3 -I src   -bs-package-name advent-of-code-rescript -bs-package-output commonjs:lib/js/$in_d:.js $i
   dyndep = 1
   restat = 1
+o src/Year2020Day9.cmj src/Year2020Day9.cmi ../js/src/Year2020Day9.js : mij src/Year2020Day9.ast
+o src/Week3/Year2020Day7.ast : astj ../../src/Week3/Year2020Day7.res
+o src/Week3/Year2020Day7.d : deps src/Week3/Year2020Day7.ast
+o src/Week3/Year2020Day7.cmj src/Week3/Year2020Day7.cmi ../js/src/Week3/Year2020Day7.js : mij src/Week3/Year2020Day7.ast
+o src/Week4/Year2020Day8.ast : astj ../../src/Week4/Year2020Day8.res
+o src/Week4/Year2020Day8.d : deps src/Week4/Year2020Day8.ast
+o src/Week4/Year2020Day8.cmj src/Week4/Year2020Day8.cmi ../js/src/Week4/Year2020Day8.js : mij src/Week4/Year2020Day8.ast
+o src/Week2/Year2020Day2.ast : astj ../../src/Week2/Year2020Day2.res
+o src/Week2/Year2020Day2.d : deps src/Week2/Year2020Day2.ast
+o src/Week2/Year2020Day2.cmj src/Week2/Year2020Day2.cmi ../js/src/Week2/Year2020Day2.js : mij src/Week2/Year2020Day2.ast
+o src/Week2/Year2020Day4.ast : astj ../../src/Week2/Year2020Day4.res
+o src/Week2/Year2020Day4.d : deps src/Week2/Year2020Day4.ast
 o src/Week2/Year2020Day4.cmj src/Week2/Year2020Day4.cmi ../js/src/Week2/Year2020Day4.js : mij src/Week2/Year2020Day4.ast
+o src/Week2/Year2020Day4_t1.ast : astj ../../src/Week2/Year2020Day4_t1.res
+o src/Week2/Year2020Day4_t1.d : deps src/Week2/Year2020Day4_t1.ast
+o src/Week2/Year2020Day4_t1.cmj src/Week2/Year2020Day4_t1.cmi ../js/src/Week2/Year2020Day4_t1.js : mij src/Week2/Year2020Day4_t1.ast
 o src/Week1/Year2020Day3.ast : astj ../../src/Week1/Year2020Day3.res
 o src/Week1/Year2020Day3.d : deps src/Week1/Year2020Day3.ast
 o src/Week1/Year2020Day3.cmj src/Week1/Year2020Day3.cmi ../js/src/Week1/Year2020Day3.js : mij src/Week1/Year2020Day3.ast

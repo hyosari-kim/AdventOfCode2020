@@ -2,114 +2,88 @@
 'use strict';
 
 var Fs = require("fs");
+var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_List = require("rescript/lib/js/belt_List.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var Caml_format = require("rescript/lib/js/caml_format.js");
 
 var input = Fs.readFileSync("input/Week2/Year2020Day2.txt", "utf8");
 
-var db = Belt_List.map(Belt_List.fromArray(input.split("\n")), (function (r) {
-        var match = Belt_List.fromArray(r.split(":"));
-        if (match) {
-          var match$1 = match.tl;
-          if (match$1) {
-            var p = Belt_List.fromArray(match.hd.split(" "));
-            var policy;
-            if (p) {
-              var match$2 = p.tl;
-              if (match$2) {
-                policy = {
-                  p: Belt_List.fromArray(p.hd.split("-")),
-                  letter: match$2.hd
-                };
-              } else {
-                throw {
-                      RE_EXN_ID: "Match_failure",
-                      _1: [
-                        "Year2020Day2.res",
-                        50,
-                        14
-                      ],
-                      Error: new Error()
-                    };
-              }
-            } else {
-              throw {
-                    RE_EXN_ID: "Match_failure",
-                    _1: [
-                      "Year2020Day2.res",
-                      50,
-                      14
-                    ],
-                    Error: new Error()
-                  };
+var db = Belt_List.fromArray(Belt_Array.keepMap(Belt_Array.map(input.split("\n"), (function (p) {
+                return p.split(/[- :]/g);
+              })), (function (p) {
+            if (p.length !== 5) {
+              return ;
             }
-            return {
-                    policy: policy,
-                    pw: match$1.hd.trim()
-                  };
-          }
-          throw {
-                RE_EXN_ID: "Match_failure",
-                _1: [
-                  "Year2020Day2.res",
-                  42,
-                  8
-                ],
-                Error: new Error()
-              };
-        }
-        throw {
-              RE_EXN_ID: "Match_failure",
-              _1: [
-                "Year2020Day2.res",
-                42,
-                8
-              ],
-              Error: new Error()
-            };
-      }));
+            var min = p[0];
+            if (min === undefined) {
+              return ;
+            }
+            var max = p[1];
+            if (max === undefined) {
+              return ;
+            }
+            var letter = p[2];
+            if (letter === undefined) {
+              return ;
+            }
+            var match = p[3];
+            if (match === undefined) {
+              return ;
+            }
+            var pw = p[4];
+            if (pw === undefined) {
+              return ;
+            }
+            var match$1 = Belt_Int.fromString(min);
+            var match$2 = Belt_Int.fromString(max);
+            if (match$1 !== undefined && match$2 !== undefined) {
+              return {
+                      min: match$1,
+                      max: match$2,
+                      letter: letter,
+                      pw: pw.trim()
+                    };
+            }
+            
+          })));
 
-console.log(Belt_List.length(Belt_List.keep(db, (function (param) {
-                var match = param.policy;
-                var letter = match.letter;
-                var p = match.p;
-                var count = Belt_Array.reduce(param.pw.split(""), 0, (function (acc, c) {
-                        if (c === letter) {
-                          return acc + 1 | 0;
-                        } else {
-                          return acc;
-                        }
-                      }));
-                if (!p) {
-                  return false;
-                }
-                var match$1 = p.tl;
-                if (match$1 && Caml_format.caml_int_of_string(p.hd) <= count) {
-                  return Caml_format.caml_int_of_string(match$1.hd) >= count;
+console.log(Belt_List.length(Belt_List.keep(Belt_List.map(db, (function (param) {
+                    var letter = param.letter;
+                    var countLetter = function (a, b) {
+                      if (b === letter) {
+                        return a + 1 | 0;
+                      } else {
+                        return a;
+                      }
+                    };
+                    var cnt = Belt_Array.reduce(param.pw.split(""), 0, countLetter);
+                    return [
+                            param.min,
+                            param.max,
+                            cnt
+                          ];
+                  })), (function (r) {
+                var cnt = r[2];
+                if (r[0] <= cnt) {
+                  return r[1] >= cnt;
                 } else {
                   return false;
                 }
               }))));
 
-console.log(Belt_List.length(Belt_List.keep(db, (function (param) {
-                var pw = param.pw;
-                var match = param.policy;
-                var letter = match.letter;
-                var positions = match.p;
-                if (!positions) {
-                  return false;
-                }
-                var match$1 = positions.tl;
-                if (!match$1) {
-                  return false;
-                }
-                var firstPos = Caml_format.caml_int_of_string(positions.hd);
-                var lastPos = Caml_format.caml_int_of_string(match$1.hd);
-                var isFirstExsists = pw[firstPos - 1 | 0] === letter;
-                var isLastExists = pw[lastPos - 1 | 0] === letter;
-                if (isFirstExsists || isLastExists) {
-                  return !(isFirstExsists && isLastExists);
+console.log(Belt_List.length(Belt_List.keep(Belt_List.map(db, (function (param) {
+                    var pw = param.pw;
+                    return [
+                            pw[param.min - 1 | 0],
+                            pw[param.max - 1 | 0],
+                            param.letter
+                          ];
+                  })), (function (r) {
+                var letter = r[2];
+                var l = r[1];
+                var f = r[0];
+                if (f === letter || l === letter) {
+                  return !(f === letter && l === letter);
                 } else {
                   return false;
                 }

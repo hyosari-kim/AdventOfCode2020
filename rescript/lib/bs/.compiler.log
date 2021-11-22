@@ -1,12 +1,2 @@
-#Start(1624610806710)
-
-  Warning number 33
-  /Users/hyoeunkim/code/2020_AOC_ReScript/src/Week1/Year2020Day3.res:1:1-9
-
-  1 │ open Belt
-  2 │ let input = Node.Fs.readFileAsUtf8Sync("input/Week1/Year2020Day3.txt")
-  3 │ 
-
-  unused open Belt.
-
-#Done(1624610806800)
+#Start(1637762538952)
+#Done(1637762538953)
