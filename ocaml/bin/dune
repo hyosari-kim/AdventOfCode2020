@@ -1,0 +1,3 @@
+(executable
+ (name aoc1)
+ (libraries core lib))
